@@ -1,0 +1,37 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Document</title>
+</head>
+<body>
+    <h1>Read</h1>
+
+    <script src="https://cdn.jsdelivr.net/npm/axios/dist/axios.min.js"></script>
+
+    <script>
+        // 댓글 처리
+        const path = "http://192.168.0.28:9090/posts"
+
+        const getPosts = async() => {
+            const res = await axios.get(path)   
+            // await: get 방식으로 동작할 때까지 기다림
+            // 비동기 함수지만 일반 동기화 된 함수처럼 사용
+            // await, asynce는 항상 같이 사용
+            return res.data
+        }
+
+        // console.log(getPosts())     // promise 반환
+
+        // axios.get(path) // server 컴퓨터의 JSON 데이터를 가져옴
+        // .then(res => {
+        //     console.log(res.data)
+        // })
+        // .catch(ex => {
+
+        // })
+    </script>
+</body>
+</html>
