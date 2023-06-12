@@ -8,6 +8,8 @@ create table tbl_reply (
 )
 ;
 
+select * from tbl_reply;
+
 select count(*) from tbl_reply
 ;
 
