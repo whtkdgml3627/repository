@@ -1,5 +1,7 @@
 <!DOCTYPE html>
-<html lang="en">
+<html xmlns:th="http://www.thymeleaf.org"
+      xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
+      layout:decorate="~{layout/layout1.html}">
 <head>
     <meta charset="UTF-8">
     <meta http-equiv="X-UA-Compatible" content="IE=edge">
@@ -7,21 +9,86 @@
     <title>Document</title>
 </head>
 <body>
+    <div layout:fragment="content">
     <h1>Read</h1>
+    <ul class="postsDiv"></ul>
+
+    <div class="modal" tabindex="-1" role="dialog">
+        <div class="modal-dialog" role="document">
+          <div class="modal-content">
+            <div class="modal-header">
+              <h5 class="modal-title">Modal title</h5>
+              <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                <span aria-hidden="true">&times;</span>
+              </button>
+            </div>
+            <div class="modal-body">
+              <p>Modal body text goes here.</p>
+            </div>
+            <div class="modal-footer">
+              <button type="button" class="btn btn-primary">Save changes</button>
+              <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
+            </div>
+          </div>
+        </div>
+      </div>
 
     <script src="https://cdn.jsdelivr.net/npm/axios/dist/axios.min.js"></script>
 
-    <script>
+    </div>
+
+    <script layout:fragment="script" th:inline="javascript">
+        const postsDiv = document.querySelector(".postsDiv")
         // 댓글 처리
         const path = "http://192.168.0.28:9090/posts"
+        const modalDiv = $(".modal")
+
+        postsDiv.addEventListener("click", e => {
+
+            e.preventDefault()
+            e.stopPropagation()
+
+            const target = e.target
+
+            console.log(target)
+
+            const id = target.getAttribute("data-id")
+
+            console.log(id)
+
+            getPostsOne(id).then(post => {
+                console.log(post)
+                modalDiv.modal('show')
+            })
+
+        }, false)
 
         const getPosts = async() => {
             const res = await axios.get(path)   
             // await: get 방식으로 동작할 때까지 기다림
             // 비동기 함수지만 일반 동기화 된 함수처럼 사용
             // await, asynce는 항상 같이 사용
+            // async 함수의 호출은 promise 반환
             return res.data
         }
+
+        const getPostsOne = async (id) => {
+            const res = await axios.get(`${path}/${id}`)
+            return res.data
+        }
+
+        getPosts().then(arr => {
+
+            let str = ""
+
+            console.log(arr)
+            for(let i = 0; i < arr.length; i++){
+                const {id, title, author} = arr[i]
+                str += `<li data-id=${id}>${title}</li>`
+            }
+            console.log(str)
+            postsDiv.innerHTML = str
+        }) 
 
         // console.log(getPosts())     // promise 반환
 
