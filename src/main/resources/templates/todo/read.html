@@ -10,30 +10,39 @@
 </head>
 <body>
     <div layout:fragment="content">
-    <h1>Read</h1>
-    <ul class="postsDiv"></ul>
+        <h1>Read</h1>
+        <ul class="postsDiv"></ul>
 
-    <div class="modal" tabindex="-1" role="dialog">
-        <div class="modal-dialog" role="document">
-          <div class="modal-content">
-            <div class="modal-header">
-              <h5 class="modal-title">Modal title</h5>
-              <button type="button" class="close" data-dismiss="modal" aria-label="Close">
-                <span aria-hidden="true">&times;</span>
-              </button>
-            </div>
-            <div class="modal-body">
-              <p>Modal body text goes here.</p>
-            </div>
-            <div class="modal-footer">
-              <button type="button" class="btn btn-primary">Save changes</button>
-              <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
-            </div>
-          </div>
+        <div class="registForm">
+            <input type="text" class="registTitle" name="title">
+            <input type="text" class="registAuthor" name="author">
+            <button class="registBtn">regist</button>
         </div>
-      </div>
 
-    <script src="https://cdn.jsdelivr.net/npm/axios/dist/axios.min.js"></script>
+        <div class="modal" tabindex="-1" role="dialog">
+            <div class="modal-dialog" role="document">
+            <div class="modal-content">
+                <div class="modal-header">
+                <h5 class="modal-title">Modal title</h5>
+                <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                    <span aria-hidden="true">&times;</span>
+                </button>
+                </div>
+                <div class="modal-body">
+                    <input type="text" class="modalTitle" name="title">
+                    <input type="text" class="modalAuthor" name="author">
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-danger btnDelete">DELETE</button>
+                    <button type="button" class="btn btn-primary btnModify">MODIFY</button>
+                    <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
+                </div>
+            </div>
+            </div>
+        </div>
+
+        <script src="https://cdn.jsdelivr.net/npm/axios/dist/axios.min.js"></script>
+        <script src="/js/axios.js"></script>
 
     </div>
 
@@ -52,43 +61,64 @@
 
             console.log(target)
 
-            const id = target.getAttribute("data-id")
+            const pid = target.getAttribute("data-id")
 
-            console.log(id)
+            console.log(pid)
 
-            getPostsOne(id).then(post => {
+            getPostsOne(pid).then(post => {
                 console.log(post)
+                const {id, title, author} = post
+                //modal의 내용물을 변경
+                document.querySelector(".modal-title").innerHTML = id
+                document.querySelector(".modalTitle").value = title
+                document.querySelector(".modalAuthor").value = author
                 modalDiv.modal('show')
             })
 
         }, false)
 
-        const getPosts = async() => {
-            const res = await axios.get(path)   
-            // await: get 방식으로 동작할 때까지 기다림
-            // 비동기 함수지만 일반 동기화 된 함수처럼 사용
-            // await, asynce는 항상 같이 사용
-            // async 함수의 호출은 promise 반환
-            return res.data
-        }
+        document.querySelector(".btnDelete").addEventListener("click", e => {
+            
+            const id = document.querySelector(".modal-title").innerHTML
+            deletePostOne(id).then(result => {
+                console.log(result)
+                modalDiv.modal('hide')
+                getDataDefault()
+            })
 
-        const getPostsOne = async (id) => {
-            const res = await axios.get(`${path}/${id}`)
-            return res.data
-        }
+        }, false)
 
-        getPosts().then(arr => {
+        document.querySelector(".registBtn").addEventListener("click", e => {
+               
+            const regTitle = document.querySelector(".registTitle").value
+            const regAuthor = document.querySelector(".registAuthor").value
 
-            let str = ""
+            const temp = {title: regTitle, author: regAuthor}
 
-            console.log(arr)
-            for(let i = 0; i < arr.length; i++){
-                const {id, title, author} = arr[i]
-                str += `<li data-id=${id}>${title}</li>`
-            }
-            console.log(str)
-            postsDiv.innerHTML = str
-        }) 
+            postOne(temp).then(result => {
+                console.log(result)
+                document.querySelector(".registTitle").value = ''
+                document.querySelector(".registAuthor").value = ''
+                getDataDefault()
+            })
+        }, false)
+
+        document.querySelector(".btnModify").addEventListener("click", e => {
+
+            const modTitle = document.querySelector(".modalTitle").value
+            const modAuthor = document.querySelector(".modalAuthor").value
+            const mid = document.querySelector(".modal-title").innerHTML
+            const temp = {id: mid, title: modTitle, author: modAuthor}
+            //console.log(mid, temp)
+
+            putPostOne(temp).then(result => {
+                console.log(result)
+                modalDiv.modal('hide')
+                getDataDefault()
+            })
+        }, false)
+
+        getDataDefault()
 
         // console.log(getPosts())     // promise 반환
 
