@@ -1,5 +1,4 @@
 create table tbl_reply (
-
 	rno int auto_increment primary key,
 	tno int not null,
 	reply varchar(1000) not null,
@@ -8,7 +7,105 @@ create table tbl_reply (
 )
 ;
 
-select * from tbl_reply;
+## 임시테이블 만들 때 사용 하는 방식
+create table tbl_reply2 (select * from tbl_reply where rno = 10)
+;
+
+alter table tbl_reply2 add column (gno int default 0);
+;
+
+drop table tbl_reply2;
+
+## 댓글 연습 테이블 생성
+create table tbl_reply2 (
+	rno int auto_increment primary key,
+	tno int not null,
+	reply varchar(1000) not null,
+	replyer varchar(100) not null,
+	replyDate timestamp default now(),
+	gno int default 0
+)
+;
+
+delete from tbl_reply2;
+
+select * from tbl_reply2
+;
+
+## 순수한 댓글 - tno
+insert into tbl_reply2 (tno, reply, replyer)
+values (100, 'R1', 'r1')
+;
+
+## gno 업데이트
+update tbl_reply2 set gno = (select last_insert_id()) where rno = 5
+;
+
+## 1번의 대댓글
+insert into tbl_reply2 (tno, reply, replyer, gno)
+values (100, 'R1', 'r1', 1)
+;
+
+## 조회
+select
+if(rno = gno, 'R ', '  RR') as step, rno, tno, reply, replyer, replydate, gno
+from tbl_reply2 
+where tno = 100 order by gno asc
+;
+
+insert into tbl_reply2 (tno, reply, replyer, gno)
+values (100, 'R2-1', 'r1', 1)
+;
+
+## 100 글에 대해 순수한 댓글
+insert into tbl_reply2 (tno, reply, replyer)
+values (100, '2번째 댓글', 'r1')
+;
+
+insert into tbl_reply2 (tno, reply, replyer, gno)
+values (100, 'R6-2', 'r1', 5)
+;
+
+
+
+
+create table tbl_reply3 (
+	rno int auto_increment primary key,
+	tno int not null,
+	reply varchar(1000) not null,
+	replyer varchar(100) not null,
+	replyDate timestamp default now(),
+	gno int default 0
+)
+;
+
+select * from tbl_reply3 order by gno;
+
+insert into tbl_reply3 (tno, reply, replyer)
+values (100, 'test', 'tester');
+
+update tbl_reply3 set gno = (select last_insert_id()) where rno = 8;
+
+insert into tbl_reply3 (tno, reply, replyer, gno)
+values (100, 'reply1-3', 'replyer', 1);
+
+insert into tbl_reply3 (tno, reply, replyer)
+values (100, 'test3', 'tester3');
+
+insert into tbl_reply3 (tno, reply, replyer, gno)
+values (100, 'reply8-1', 'replyer', 8);
+
+select
+if(rno = gno, 'R ', '  RR') as step, rno, tno, reply, replyer, replydate, gno
+from tbl_reply3 
+where tno = 100 order by gno asc
+;
+
+
+
+
+select * from tbl_reply
+;
 
 select count(*) from tbl_reply
 ;

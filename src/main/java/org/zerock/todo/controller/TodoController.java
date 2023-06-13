@@ -25,6 +25,8 @@ public class TodoController {
 
     private final TodoService todoService;
 
+    
+
     @GetMapping("list")
     public void list(PageRequestDTO pageRequestDTO, Model model){
         log.info("get | list");
