@@ -1,0 +1,108 @@
+0613
+
+project 설계
+사용할 버전들을 먼저 정해야한다.
+
+댓글 처리
+@RestControllerAdvice
+
+대댓글 처리
+
+
+댓글 페이징 - 고민이 필요함
+새로운 댓글이 달리면 페이지가 1페이지가 아니라 마지막 페이징이 나와야 한다.
+
+
+
+댓글 : 특정한 tno의 -> 댓글
+
+대댓글
+- 어떤 댓글의 댓글인지
+- parent 상위 번호가 무엇인지 or 그룹번호 그룹핑
+- parent 방식 (그룹번호가 더 깔끔 gno)
+1. tbl_reply 테이블에 parent가 없으면 자기 번호 사용 -> rno : r1, parent : r1
+2. r1에 대댓글을 달면 rno: r4, reply: 댓1-1, gno: r1
+3. r1에 대댓글을 달면 rno: r5, reply: 댓1-2, gno: r1
+4. r4에 대댓글을 달면 rno: r6, reply: 댓1-3, gno: r1
+- 댓글(r4)에 댓글(r6)을 달지만 parent(그룹)은 첫번 째 댓글(r1)으로 그룹핑 해준다.
+5. 정렬을 (order by gno desc, rno asc)로 해준다.
+6. r2에 대댓글을 달면 rno: r7, reply: 댓2-1, gno: r2
+7. r7에 대댓글을 달면 rno: r8, reply: 댓2-2, gno: r2
+8. 복합 인덱스 (2개의 컬럼 이상이 인덱스로 지정할 때)
+- tno와 gno가 index의 기준이 된다. (rno는 pk)
+
+댓글과 대댓글을 나눠서 처리
+gno: index를 잡아야 하기 때문에 가능하면 not null 처리
+but MySql은 시퀀스가 없음 -> not null 말고 default값 넣어주기
+-> last_insert_id(): 현재 AI된 last 값 트랜잭션 보장 -> last index 값을 gno에 넣어줌
+
+댓글은 rno와 gno가 일치, 대댓글은 불일치
+
+
+
+TodoMapper.xml 수정, ReplyDTO 수정, ReplyMapper interface 생성
+ReplyMapper.xml 작성
+selectKey?
+test 돌려보기 (ReplyMappeTests.java)
+
+Entity와 DTO 구분하기
+DTO는 상황에 따라 여러 개가 존재할 수 있음
+
+
+대부부의 게시글은 댓글 수가 적음 -> 여러 번 쿼리를 날릴 필요가 없다 (화면에서 계산하는 방식 사용- 대체로 1페이지에서 끝나기 때문)
+
+쿠팡 리뷰 같은 글이 많은 경우 -> 마지막 페이지 계산해서 날려줌 (네트워크 통신을 여러 번 해야하는 게 비효율적)
+-> 일반 게시판처럼 최신 글이 위로 올라오도록 처리
+
+
+댓글 내용, 작성자 update
+매개변수 rno
+서비스 계층: transaction이 가장 중요
+
+중요한 데이터는 DB에 보관, 그 외의 경우는 file로 저장
+
+
+RestControllerAdvice
+
+
+localhost: 한 컴퓨터에서 자체 실행
+ip주소: 컴퓨터 두 대
+
+
+Spring MVC의 AOP 기능: 코드에서 에러가 발생하면 개발자가 해당 코드에서 예외 처리를 함
+@Transactional 어노테이션이 내가 만든 코드(target)를 감싸는 코드(Auto proxy)가 생성됨
+-> 이러한 기능을 Advice라고 함, 개발자는 성공의 경우만 생각하고 예외는 AOP가 처리
+
+@ControllerAdvice: ex) 예외가 발생하면 로그인 페이지로 보내는 기능 등의 역할
+@RestControllerAdvice: 예외가 발생하면 예외에 맞게 메시지를 만들어줌
+
+
+
+RestControllerAdvice는 컨트롤러에서 생성 (controller>advice>CustomRestControllerAdvice.java)
+@RestControllerAdvice 어노테이션 달아주기
+메소드에 @ExceptionHandler(처리할 예외 종류.class)
+
+axios-> .then().catch(): then은 200 코드일 때 실행, catch는 200이 아닐 때 실행
+
+@ResponseStatus(HttpStatus.BAD_REQUEST)   -> 상태 코드 지정(400)
+      -> 해당 rno가 없을 때
+
+예외는 기본이 throw로 던지는게 기본 설계이다.
+
+값이 없을 때 Exception이 나지 않지만 Exception을 던져줘야함
+이 때 무엇을 던져주어야 하는지 정해줘야함
+CustomException -> 메세지를 내가 원하는 상태로 가공하는것
+Exception.class로 만들 수 있음
+
+단점 - 예외가 많아지면 class를 많이 만들어줘야 해서 복잡하고 지저분해짐
+그래서 중첩클래스로 설계를 잡음
+
+중첩 클래스
+- 클래스 내부에 클래스를 선언해줌
+
+null이면 전달해줄 class를 RestController에서 선언해주고 생성자를 만들어줘서
+그 클래스 명으로 advice에서 사용할 수 있게 만들어줌
+
+Exception을 JSON으로 전달할 때 key값을 Error로 설정해 주는 이유는
+axios의 catch()에서 Error만 가져와서 메세지만 구분해주면 되어서 key를 Error로 설정해줌
+
