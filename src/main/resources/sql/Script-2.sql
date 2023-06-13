@@ -48,10 +48,13 @@ values (100, 'R1', 'r1', 1)
 
 ## 조회
 select
-if(rno = gno, 'R ', '  RR') as step, rno, tno, reply, replyer, replydate, gno
+if(rno = gno, 0, 1) as step, rno, tno, gno, reply, replyer, replydate
 from tbl_reply2 
-where tno = 100 order by gno asc
+where tno = 100 order by gno asc, rno asc
+limit 0, 20
 ;
+
+select * from tbl_reply2 order by gno asc;
 
 insert into tbl_reply2 (tno, reply, replyer, gno)
 values (100, 'R2-1', 'r1', 1)
