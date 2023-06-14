@@ -1,0 +1,123 @@
+Board Project
+
+
+
+
+1. DB 세팅
+
+생성된 localhost에서 sql 편집기 띄우기
+구글 드라이버에서 디비 생성 코드 가져와서 데이터베이스 이름 원하는 이름으로 변경
+
+디비버 MYSql 선택
+서버 호스트 - localhost, 데이터베이스 - teamdb(설정한 이름)
+id, pw 입력
+테스트 커넥션 돌리고 피니시
+
+
+
+2. 개발 pc에서 프로젝트 생성, 개발 환경 설정, 디비 연결
+
+스프링 이니셜라이저에서 gradle, java, 3.1.0, JAR, 17ver
+dependencies 추가 (thymeleaf, MyBatis, MySQL, 럼벅, 스프링 dev 툴, 스프링 웹) 총 6개
+
+zip 파일 받아서 원하는 디렉토리에 압축 풀기
+cmd에서 해당 디렉토리 vs code로 오픈
+
+application.properties 설정 (url IP, db 이름 확인할 것)
+
+build.gradle 설정(test 코드 추가, build.gradle에 thymeleaf 레이아웃 라이브러리 추가)
+
+디비버 커넥션 확인: DataSource(sql) 임포트
+-> testConnection 테스트 메소드 생성
+-> 결과 확인 (HikariCP가 디비와 커넥션 연결하고 끊어주는 역할을 해줌)
+
+
+
+3. 패키지 구조 만들기
+dto, controller, service, mappers
+
+
+
+4. Controller, view 연결 확인
+Controller 클래스 생성: 어노테이션 컨트롤러, 로그, RequestMapping
+list GET 메소드 생성
+view 생성: list.html
+
+
+
+5. layout 적용
+부트스트랩 어드민에서 원하는 템플릿 다운로드하고 layout.html을 생성해서 index 파일 복붙
+html태그에 thymeleaf 선언해주기
+탐색기에서 사용할 디렉토리를 복사해서 static 디렉토리에 붙여넣기
+상대경로->절대경로로 바꿔주기 (css/ -> /css/), (lib/ -> /lib), (js/ -> /js/), (img/ -> /img/)
+
+브라우저에서 화면 어떻게 나오는지 확인:
+list.html에 layout.html 내용을 그대로 복붙
+화면을 보면서 사용할 부분을 선정해서 layout.html에 붙여넣기
+
+<div layout:fragment="이름"> -> 지정해주면 다른 html에서 사용 가능
+list.html  html 태그에 layout 사용 선언
+
+admin table.html에서도 원하는 부분을 가져와서 list.html에 복붙(리스트 템플릿)
+admin elements.html에서 페이지 버튼 가져오기
+
+
+
+6. DB 설계
+새 sql 편집기에서 create table
+select, insert 테스트
+50만건 insert
+select count
+update로 1000개 값만 데이터 수정해주기
+
+
+
+7. list
+board -> dto폴더 -> BoardDTO.java 만들기
+테이블 컬럼명 선언
+어노테이션 5개(@AllArgsConstructor, @NoArgsConstreuctor,@data, @ToString, @Builder)
+
+board -> mappers -> BoardMapper.java 만들기(인터페이스)
+list(배열) 메소드 생성
+
+resourse -> mappers -> BoardMapper.xml 만들기
+셀렉트안에 리졸트타입
+select * from tbl_board order by bno desc limit 0, 10
+
+board -> test폴더 -> BoardTest.java
+프라이빗으로 선언해야함
+테스트메소드
+보드메퍼에서 바로 호출
+
+보드어플리케이션에 매퍼스캔 어노테이션 달아주기(안하면 대굴 빡빡 맞아야함)
+
+board -> service -> BoardService.java
+어노테이션 @Transactional
+
+board -> service -> BoardServiceImpl.java
+BoardService를 상속(implements)
+파이널(상수처리) 보드매퍼
+@오버라이드
+퍼블릭 리스트 겟리스트()
+
+thymeleaf 형식 (ex th:text="")형식으로 사용할때는 el로 사용하고
+그냥 사용할때는 [[]] 대괄호 안에 사용한다
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
