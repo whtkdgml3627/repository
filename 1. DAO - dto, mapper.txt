@@ -1,0 +1,71 @@
+1. DAO - dto, mapper 
+ (테스트)
+2. service
+ (테스트)
+3. controller
+ (테스트)
+
+------------------------
+비동기통신 : 화면 안에서 바로바로 바뀌는 애들
+동기통신 : 새로운 페이지
+------------------------
+sql / axios(비동기통신)
+조회 : post
+등록 : get
+수정 : update / put
+삭제 : delete 
+------------------------
+response 받아오는거
+request 보내는거
+------------------------
+
+
+<댓글>
+
+[등록]
+
+replyMapper.xml
+ - insert (id 값 무조건 넣어)
+
+
+
+
+[리스트]
+
+RreplyMapper.java
+
+ReplyMapper.xml
+ - select
+
+ReplyService.java
+ - int 
+ - <list>
+
+ReplyServiceImpl.java
+
+ReplyController.java
+ - GetMapping
+
+포스트맨에서 데이터 받았는지 테스트
+
+read.html
+ - 데이터 왔는지 콘솔로 찍어보기
+
+
+[수정]
+
+RreplyMapper.java
+
+ReplyMapper.xml
+ - update
+
+ReplyServiceImpl.java
+int 타입 x
+
+
+ReplyController.java
+ - putmapping
+
+
+
+
