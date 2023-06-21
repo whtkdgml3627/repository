@@ -1,0 +1,23 @@
+0620 수업
+
+delete를 사용한 이유
+ajax방식으로 통신하는건 Restful로 설계를 하여서 delete를 사용했다
+delete방식은 JSON데이터를 payload할 수 없다
+delete방식은 여러개를 삭제할 때 문제가 될 수 있다
+여러개를 삭제할 때는 post방식으로 JSON데이터로 보내줘야한다
+
+@RequestBody = JSON데이터를 DTO형식으로 바꿔주는 어노테이션
+
+returntype을 Map으로 사용하는 이유는 보내는 데이터 형식을 JSON데이터 형식으로 보내주기위해서 사용함
+String으로 사용하면 문자열로 전달되기 때문
+
+java내부에서 체크하는 경우는 checked Exception
+
+LOB large object
+db에 파일을 저장하는 방법이나 쓰지 않는다
+db에는 파일 이름만 저장
+
+대용량처리
+- spring batch 사용
+- 스케줄러랑 같이 사용
+- Crontab -> 스케줄러 만들 때 사용
